@@ -2,6 +2,7 @@ use crate::vec3::Color;
 
 mod vec3;
 mod color;
+mod ray;
 
 fn main() {
 	let image_width = 256;
