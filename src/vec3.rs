@@ -8,9 +8,15 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
-	pub fn new() -> Self {
+	pub fn new<T, R, S>(x: T, y: R, z: S) -> Self
+	where
+		T: Into<f64>,
+		R: Into<f64>,
+		S: Into<f64>,
+	{
+		let (x, y, z) = (x.into(), y.into(), z.into());
 		Self {
-			e: [0.0; 3]
+			e: [x, y, z]
 		}
 	}
 
@@ -128,7 +134,7 @@ pub fn dot(u: Vec3, v: Vec3) -> f64{
 
 #[inline]
 pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
-	let mut res = Vec3::new();
+	let mut res = Vec3::new(0, 0, 0);
 	res.e[0] = u.e[1] * v.e[2] - u.e[2] * v.e[1];
 	res.e[1] = u.e[2] * v.e[0] - u.e[0] * v.e[2];
 	res.e[2] = u.e[0] * v.e[1] - u.e[1] * v.e[0];
