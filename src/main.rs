@@ -50,7 +50,7 @@ fn main() {
 	// Render
 	println!("P3\n{} {}\n255", image_width, image_height);
 	for i in (0..image_height).rev() {
-		eprint!("Scan lines remaining: {}\n", i);
+		eprint!("Scan lines remaining: {}\r", i);
 		for j in 0..image_width {
 			let u = j as f64 / (image_width - 1) as f64;
 			let v = i as f64 / (image_height - 1) as f64;

@@ -28,7 +28,6 @@ impl<T: Hittable> Hittable for HittableList<T> {
 		for object in &self.objects {
 			if object.hit(r, t_min, closet_so_far, &mut temp_rec) {
 				hit_anything = true;
-				break;
 				closet_so_far = temp_rec.t;
 				*rec = temp_rec.clone();
 			}
