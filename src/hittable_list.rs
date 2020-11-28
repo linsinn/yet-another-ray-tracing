@@ -2,8 +2,8 @@ use crate::hittable::{Hittable, HitRecord};
 use std::rc::Rc;
 use crate::ray::Ray;
 
-struct HittableList<T: Hittable> {
-	objects: Vec<Rc<T>>
+pub struct HittableList<T: Hittable> {
+	pub objects: Vec<Rc<T>>
 }
 
 impl<T: Hittable> HittableList<T> {
@@ -28,7 +28,7 @@ impl<T: Hittable> Hittable for HittableList<T> {
 		for object in &self.objects {
 			if object.hit(r, t_min, closet_so_far, &mut temp_rec) {
 				hit_anything = true;
-				break
+				break;
 				closet_so_far = temp_rec.t;
 				*rec = temp_rec.clone();
 			}
