@@ -53,6 +53,12 @@ impl Vec3 {
 			e: [random_double_range(min, max), random_double_range(min, max), random_double_range(min, max)]
 		}
 	}
+
+	#[inline]
+	pub fn near_zero(&self) -> bool {
+		let eps = 1e-8;
+		self.e.iter().all(|&v| v < eps)
+	}
 }
 
 impl ops::Neg for Vec3 {
@@ -144,17 +150,22 @@ impl ops::Div<f64> for Vec3 {
 }
 
 #[inline]
-pub fn dot(u: Vec3, v: Vec3) -> f64{
+pub fn dot(u: &Vec3, &v: &Vec3) -> f64 {
 	u.e.iter().zip(v.e.iter()).map(|(&a, &b)| a * b).sum::<f64>()
 }
 
 #[inline]
-pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
+pub fn cross(u: &Vec3, v: &Vec3) -> Vec3 {
 	let mut res = Vec3::new(0, 0, 0);
 	res.e[0] = u.e[1] * v.e[2] - u.e[2] * v.e[1];
 	res.e[1] = u.e[2] * v.e[0] - u.e[0] * v.e[2];
 	res.e[2] = u.e[0] * v.e[1] - u.e[1] * v.e[0];
 	res
+}
+
+#[inline]
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+	*v - 2.0 * dot(v, n) * *n
 }
 
 #[inline]
@@ -181,7 +192,7 @@ pub fn random_unit_vector() -> Vec3 {
 #[inline]
 pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
 	let in_unit_sphere = random_in_unit_sphere();
-	if dot(in_unit_sphere, *normal) > 0.0 {
+	if dot(&in_unit_sphere, normal) > 0.0 {
 		in_unit_sphere
 	} else {
 		-in_unit_sphere

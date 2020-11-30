@@ -16,9 +16,11 @@ mod sphere;
 mod hittable_list;
 mod utils;
 mod camera;
+mod material;
 
 use image;
 use std::cmp::max;
+use crate::material::{Lambertian, Metal};
 
 fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
 	let mut rec = HitRecord::new();
@@ -28,9 +30,18 @@ fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
 	}
 
 	if world.hit(r, 0.001, INFINITY, &mut rec) {
-		// let target = rec.p + rec.normal + random_unit_vector();
-		let target = rec.p + random_in_hemisphere(&rec.normal);
-		0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)
+		let mut scattered = Ray::default();
+		let mut attenuation = Color::default();
+		if let Some(p) = &rec.mat_ptr {
+			let p = p.clone();
+			if p.scatter(r, &mut rec, &mut attenuation, &mut scattered) {
+				attenuation * ray_color(&scattered, world, depth - 1)
+			} else {
+				Color::default()
+			}
+		} else {
+			Color::default()
+		}
 	} else {
 		let unit_direction = unit_vector(r.direction());
 		let t = 0.5 * (unit_direction.y() + 1.0);
@@ -49,8 +60,16 @@ fn main() {
 
 	// World
 	let mut world = HittableList::new();
-	world.add(Rc::new(Sphere::new(Point3::new(0, 0, -1), 0.5)));
-	world.add(Rc::new(Sphere::new(Point3::new(0, -100.5, -1), 100)));
+
+	let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+	let material_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+	let material_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3));
+	let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
+
+	world.add(Rc::new(Sphere::new(Point3::new(0, -100.5, -1), 100, material_ground)));
+	world.add(Rc::new(Sphere::new(Point3::new(0, 0, -1), 0.5, material_center)));
+	world.add(Rc::new(Sphere::new(Point3::new(-1, 0, -1), 0.5, material_left)));
+	world.add(Rc::new(Sphere::new(Point3::new(1, 0, -1), 0.5, material_right)));
 
 	// Camera
 	let cam = Camera::new();
