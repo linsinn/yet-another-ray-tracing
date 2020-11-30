@@ -1,4 +1,4 @@
-use crate::vec3::{Color, Vec3, unit_vector, Point3, dot};
+use crate::vec3::{Color, Vec3, unit_vector, Point3, dot, random_unit_vector, random_in_hemisphere};
 use crate::ray::Ray;
 use crate::color::get_pixel_color;
 use crate::hittable::{Hittable, HitRecord};
@@ -18,11 +18,19 @@ mod utils;
 mod camera;
 
 use image;
+use std::cmp::max;
 
-fn ray_color<T: Hittable>(r: &Ray, world: &T) -> Color {
+fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
 	let mut rec = HitRecord::new();
-	if world.hit(r, 0.0, INFINITY, &mut rec) {
-		0.5 * (rec.normal + Color::new(1, 1, 1))
+
+	if depth <= 0 {
+		return Color::default();
+	}
+
+	if world.hit(r, 0.001, INFINITY, &mut rec) {
+		// let target = rec.p + rec.normal + random_unit_vector();
+		let target = rec.p + random_in_hemisphere(&rec.normal);
+		0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)
 	} else {
 		let unit_direction = unit_vector(r.direction());
 		let t = 0.5 * (unit_direction.y() + 1.0);
@@ -37,6 +45,7 @@ fn main() {
 	let image_width = 400;
 	let image_height = (image_width as f64 / aspect_ratio) as i32;
 	let samples_per_pixel = 100;
+	let max_depth = 50;
 
 	// World
 	let mut world = HittableList::new();
@@ -56,7 +65,7 @@ fn main() {
 				let u = (j as f64 + random_double()) / (image_width - 1) as f64;
 				let v = (i as f64 + random_double()) / (image_height - 1) as f64;
 				let r = cam.get_ray(u, v);
-				pixel_color += ray_color(&r, &world);
+				pixel_color += ray_color(&r, &world, max_depth);
 			}
 			let (r, g, b) = get_pixel_color(pixel_color, samples_per_pixel);
 			buf.push(r);

@@ -1,6 +1,8 @@
 use std::ops;
 use std::convert::{TryFrom, TryInto};
 use std::ops::{Add, Neg, Sub, Mul};
+use crate::utils::{random_double, random_double_range};
+use rand::random;
 
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Vec3 {
@@ -36,6 +38,20 @@ impl Vec3 {
 
 	pub fn length_squared(&self) -> f64 {
 		self.e.iter().map(|&v| v * v).sum::<f64>()
+	}
+
+	#[inline]
+	pub fn random() -> Vec3 {
+		Self {
+			e: [random_double(), random_double(), random_double()]
+		}
+	}
+
+	#[inline]
+	pub fn random_range(min: f64, max: f64) -> Vec3 {
+		Self {
+			e: [random_double_range(min, max), random_double_range(min, max), random_double_range(min, max)]
+		}
 	}
 }
 
@@ -141,9 +157,37 @@ pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
 	res
 }
 
+#[inline]
 pub fn unit_vector(v: Vec3) -> Vec3 {
 	v / v.length()
 }
+
+
+#[inline]
+pub fn random_in_unit_sphere() -> Vec3 {
+	loop {
+		let p = Vec3::random_range(-1.0, 1.0);
+		if p.length_squared() < 1.0 {
+			return p;
+		}
+	}
+}
+
+#[inline]
+pub fn random_unit_vector() -> Vec3 {
+	unit_vector(random_in_unit_sphere())
+}
+
+#[inline]
+pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
+	let in_unit_sphere = random_in_unit_sphere();
+	if dot(in_unit_sphere, *normal) > 0.0 {
+		in_unit_sphere
+	} else {
+		-in_unit_sphere
+	}
+}
+
 
 pub type Point3 = Vec3;
 pub type Color = Vec3;
