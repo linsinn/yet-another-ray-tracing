@@ -1,6 +1,6 @@
 use crate::vec3::{Color, Vec3, unit_vector, Point3, dot};
 use crate::ray::Ray;
-use crate::color::write_color;
+use crate::color::get_pixel_color;
 use crate::hittable::{Hittable, HitRecord};
 use crate::utils::{INFINITY, random_double};
 use crate::hittable_list::HittableList;
@@ -16,6 +16,8 @@ mod sphere;
 mod hittable_list;
 mod utils;
 mod camera;
+
+use image;
 
 fn ray_color<T: Hittable>(r: &Ray, world: &T) -> Color {
 	let mut rec = HitRecord::new();
@@ -45,9 +47,9 @@ fn main() {
 	let cam = Camera::new();
 
 	// Render
-	println!("P3\n{} {}\n255", image_width, image_height);
+	let mut buf = Vec::with_capacity((image_height * image_width * 3) as usize);
 	for i in (0..image_height).rev() {
-		eprint!("Scan lines remaining: {}\r", i);
+		eprint!("Scan lines remaining: {:03}\r", i);
 		for j in 0..image_width {
 			let mut pixel_color = Color::default();
 			for _ in 0..samples_per_pixel {
@@ -56,8 +58,12 @@ fn main() {
 				let r = cam.get_ray(u, v);
 				pixel_color += ray_color(&r, &world);
 			}
-			write_color(pixel_color, samples_per_pixel);
+			let (r, g, b) = get_pixel_color(pixel_color, samples_per_pixel);
+			buf.push(r);
+			buf.push(g);
+			buf.push(b);
 		}
 	}
+	image::save_buffer("image.png", &buf, image_width as u32, image_height as u32, image::ColorType::Rgb8).unwrap();
 	eprint!("\nDone.\n");
 }
