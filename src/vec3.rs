@@ -2,7 +2,7 @@ use std::ops;
 use std::convert::{TryFrom, TryInto};
 use std::ops::{Add, Neg, Sub, Mul};
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct Vec3 {
 	pub e: [f64; 3]
 }
