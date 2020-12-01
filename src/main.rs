@@ -21,7 +21,6 @@ mod material;
 use image;
 use std::cmp::max;
 use crate::material::{Lambertian, Metal, Dielectric};
-use image::error::LimitErrorKind::DimensionError;
 
 fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
 	let mut rec = HitRecord::new();
@@ -70,16 +69,22 @@ fn main() {
 	world.add(Rc::new(Sphere::new(Point3::new(0, -100.5, -1), 100, material_ground)));
 	world.add(Rc::new(Sphere::new(Point3::new(0, 0, -1), 0.5, material_center)));
 	world.add(Rc::new(Sphere::new(Point3::new(-1, 0, -1), 0.5, material_left.clone())));
-	world.add(Rc::new(Sphere::new(Point3::new(-1, 0, -1), -0.4, material_left)));
+	world.add(Rc::new(Sphere::new(Point3::new(-1, 0, -1), -0.45, material_left)));
 	world.add(Rc::new(Sphere::new(Point3::new(1, 0, -1), 0.5, material_right)));
 
 	// Camera
-	let cam = Camera::new();
+	let cam = Camera::new(
+		Point3::new(-2, 2, 1),
+		Point3::new(0, 0, -1),
+		Vec3::new(0, 1, 0),
+		20.0,
+		aspect_ratio
+	);
 
 	// Render
 	let mut buf = Vec::with_capacity((image_height * image_width * 3) as usize);
 	for i in (0..image_height).rev() {
-		eprint!("Scan lines remaining: {:03}\r", i);
+		eprint!("Scan lines remaining: {:3}\r", i);
 		for j in 0..image_width {
 			let mut pixel_color = Color::default();
 			for _ in 0..samples_per_pixel {

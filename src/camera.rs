@@ -1,6 +1,7 @@
-use crate::vec3::{Point3, Vec3};
+use crate::vec3::{Point3, Vec3, unit_vector, cross};
 use std::env::VarError;
 use crate::ray::Ray;
+use crate::utils::degrees_to_radians;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Camera {
@@ -11,16 +12,27 @@ pub struct Camera {
 }
 
 impl Camera {
-	pub fn new() -> Self {
-		// Camera
-		let aspect_ratio = 16.0 / 9.0;
-		let viewport_height = 2.0;
+	pub fn new(
+		look_from: Point3,
+		look_at: Point3,
+		v_up: Vec3,
+		v_fov: f64, // vertical field-of-view in degrees
+		aspect_ratio: f64
+	) -> Self {
+		let theta = degrees_to_radians(v_fov);
+		let h = (theta / 2.0).tan();
+
+		let viewport_height = 2.0 * h;
 		let viewport_width = viewport_height * aspect_ratio;
-		let focal_length = 1.0;
-		let origin = Point3::default();
-		let horizontal = Vec3::new(viewport_width, 0, 0);
-		let vertical = Vec3::new(0, viewport_height, 0);
-		let lower_left_corner =  origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0, 0, focal_length);
+
+		let w = unit_vector(look_from - look_at);
+		let u = unit_vector(cross(&v_up, &w));
+		let v = cross(&w, &u);
+
+		let origin = look_from;
+		let horizontal = viewport_width * u;
+		let vertical = viewport_height * v;
+		let lower_left_corner =  origin - horizontal / 2.0 - vertical / 2.0 - w;
 		Self {
 			origin,
 			lower_left_corner,
