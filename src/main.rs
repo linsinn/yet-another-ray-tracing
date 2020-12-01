@@ -73,12 +73,20 @@ fn main() {
 	world.add(Rc::new(Sphere::new(Point3::new(1, 0, -1), 0.5, material_right)));
 
 	// Camera
+	let look_from = Point3::new(3, 3, 2);
+	let look_at = Point3::new(0, 0, -1);
+	let v_up = Vec3::new(0, 1, 0);
+	let dist_to_focus = (look_from - look_at).length();
+	let aperture = 10.0;
+
 	let cam = Camera::new(
-		Point3::new(-2, 2, 1),
-		Point3::new(0, 0, -1),
-		Vec3::new(0, 1, 0),
+		look_from,
+		look_at,
+		v_up,
 		20.0,
-		aspect_ratio
+		aspect_ratio,
+		aperture,
+		dist_to_focus
 	);
 
 	// Render
