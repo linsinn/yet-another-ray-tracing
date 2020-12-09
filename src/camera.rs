@@ -1,5 +1,4 @@
 use crate::vec3::{Point3, Vec3, unit_vector, cross, random_in_unit_disk};
-use std::env::VarError;
 use crate::ray::Ray;
 use crate::utils::degrees_to_radians;
 

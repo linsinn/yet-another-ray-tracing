@@ -1,8 +1,6 @@
 use std::ops;
 use std::convert::{TryFrom, TryInto};
-use std::ops::{Add, Neg, Sub, Mul};
 use crate::utils::{random_double, random_double_range};
-use rand::random;
 
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Vec3 {
@@ -195,6 +193,7 @@ pub fn random_unit_vector() -> Vec3 {
 	unit_vector(random_in_unit_sphere())
 }
 
+#[allow(dead_code)]
 #[inline]
 pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
 	let in_unit_sphere = random_in_unit_sphere();

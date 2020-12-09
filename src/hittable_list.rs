@@ -15,6 +15,7 @@ impl<T: Hittable> HittableList<T> {
 		self.objects.push(object.clone());
 	}
 
+	#[allow(dead_code)]
 	pub fn clear(&mut self) {
 		self.objects.clear();
 	}

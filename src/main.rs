@@ -1,4 +1,4 @@
-use crate::vec3::{Color, Vec3, unit_vector, Point3, dot, random_unit_vector, random_in_hemisphere};
+use crate::vec3::{Color, Vec3, unit_vector, Point3};
 use crate::ray::Ray;
 use crate::color::get_pixel_color;
 use crate::hittable::{Hittable, HitRecord};
@@ -19,9 +19,7 @@ mod camera;
 mod material;
 
 use image;
-use std::cmp::max;
 use crate::material::{Lambertian, Metal, Dielectric};
-use rand::random;
 
 fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
 	let mut rec = HitRecord::new();
@@ -54,9 +52,9 @@ fn ray_color<T: Hittable>(r: &Ray, world: &T, depth: i32) -> Color {
 fn main() {
 	// Image
 	let aspect_ratio = 3.0 / 2.0;
-	let image_width = 900;
+	let image_width = 300;
 	let image_height = (image_width as f64 / aspect_ratio) as i32;
-	let samples_per_pixel = 500;
+	let samples_per_pixel = 100;
 	let max_depth = 50;
 
 	// World
@@ -101,7 +99,7 @@ fn main() {
 	eprint!("\nDone.\n");
 }
 
-fn random_scene() -> HittableList<Sphere> {
+fn random_scene() -> impl Hittable {
 	let mut world = HittableList::new();
 	let ground_material = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
 	world.add(Rc::new(Sphere::new(Point3::new(0, -1000, 0), 1000.0, ground_material)));
