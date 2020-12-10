@@ -1,17 +1,17 @@
 use crate::vec3::{Point3, dot};
 use crate::hittable::{Hittable, HitRecord};
 use crate::ray::Ray;
-use std::rc::Rc;
 use crate::material::Material;
+use std::sync::Arc;
 
 pub struct Sphere {
 	pub center: Point3,
 	pub radius: f64,
-	pub mat_ptr: Rc<dyn Material>
+	pub mat_ptr: Arc<dyn Material + Send + Sync>
 }
 
 impl Sphere {
-	pub fn new<T>(center: Point3, radius: T, mat_ptr: Rc<dyn Material>) -> Self
+	pub fn new<T>(center: Point3, radius: T, mat_ptr: Arc<dyn Material + Send + Sync>) -> Self
 	where T: Into<f64>
 	{
 		let radius = radius.into();

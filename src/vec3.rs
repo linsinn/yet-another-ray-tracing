@@ -1,10 +1,21 @@
 use std::ops;
 use std::convert::{TryFrom, TryInto};
 use crate::utils::{random_double, random_double_range};
+use std::iter::Sum;
 
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Vec3 {
 	pub e: [f64; 3]
+}
+
+impl Sum for Vec3 {
+	fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+		let mut ret = Self::new(0, 0, 0);
+		for i in iter {
+			ret += i;
+		}
+		ret
+	}
 }
 
 impl Vec3 {

@@ -1,17 +1,17 @@
 use crate::hittable::{Hittable, HitRecord};
-use std::rc::Rc;
 use crate::ray::Ray;
+use std::sync::Arc;
 
-pub struct HittableList<T: Hittable> {
-	pub objects: Vec<Rc<T>>
+pub struct HittableList<T: Hittable + Send + Sync> {
+	pub objects: Vec<Arc<T>>
 }
 
-impl<T: Hittable> HittableList<T> {
+impl<T: Hittable + Send + Sync> HittableList<T> {
 	pub fn new() -> Self {
 		Self { objects: vec![] }
 	}
 
-	pub fn add(&mut self, object: Rc<T>) {
+	pub fn add(&mut self, object: Arc<T>) {
 		self.objects.push(object.clone());
 	}
 
@@ -21,7 +21,7 @@ impl<T: Hittable> HittableList<T> {
 	}
 }
 
-impl<T: Hittable> Hittable for HittableList<T> {
+impl<T: Hittable + Send + Sync> Hittable for HittableList<T> {
 	fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
 		let mut temp_rec = HitRecord::new();
 		let mut hit_anything = false;
